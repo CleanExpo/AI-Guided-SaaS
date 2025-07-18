@@ -1,10 +1,1 @@
-{
-  "buildCommand": "echo 'No build required'",
-  "outputDirectory": ".",
-  "framework": null,
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 10
-    }
-  }
-}
+{}
