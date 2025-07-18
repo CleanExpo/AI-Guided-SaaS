@@ -15,15 +15,20 @@
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
     "start": "node dist/index.js",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "deploy": "node -e \"import('./dist/mcp-pipeline.js').then(m => m.runMCPDeploy(process.argv[1] || 'Auto deploy'))\"",
+    "mcp-helper": "ts-node src/cli.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.3",
+    "@types/inquirer": "^9.0.8",
     "chokidar": "^3.5.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "helmet": "^7.0.0",
     "express-rate-limit": "^6.7.0",
-    "dotenv": "^16.3.1"
+    "helmet": "^7.0.0",
+    "inquirer": "^12.7.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
