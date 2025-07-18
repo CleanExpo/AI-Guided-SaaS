@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "echo 'Development server not configured yet'",
-    "build": "echo 'No build required for API endpoints'",
+    "vercel-build": "echo 'No build required'",
     "start": "cd .mcp && npm start",
     "deploy": "vercel --prod",
     "mcp:install": "cd .mcp && npm install",
