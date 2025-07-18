@@ -1,0 +1,32 @@
+{
+  "name": "ai-guided-saas",
+  "version": "1.0.0",
+  "description": "AI-powered SaaS application with MCP integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "echo 'Development server not configured yet'",
+    "build": "cd .mcp && npm run build",
+    "start": "cd .mcp && npm start",
+    "deploy": "vercel --prod",
+    "mcp:install": "cd .mcp && npm install",
+    "mcp:build": "cd .mcp && npm run build",
+    "mcp:start": "cd .mcp && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CleanExpo/AI-Guided-SaaS.git"
+  },
+  "keywords": [
+    "ai",
+    "saas",
+    "mcp",
+    "model-context-protocol",
+    "development-tools"
+  ],
+  "author": "CleanExpo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CleanExpo/AI-Guided-SaaS/issues"
+  },
+  "homepage": "https://github.com/CleanExpo/AI-Guided-SaaS#readme"
+}
