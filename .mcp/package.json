@@ -17,11 +17,16 @@
     "start": "node dist/index.js",
     "test": "echo \"No tests yet\" && exit 0",
     "deploy": "node -e \"import('./dist/mcp-pipeline.js').then(m => m.runMCPDeploy(process.argv[1] || 'Auto deploy'))\"",
+    "deploy-cli": "ts-node src/deploy-cli.ts",
+    "setup-ssh": "ts-node -e \"import('./dist/ssh-setup.js').then(m => m.sshSetupWizard())\"",
+    "system-check": "ts-node -e \"import('./dist/system-check.js').then(m => m.runSystemCheck())\"",
+    "analyze": "ts-node -e \"import('./dist/project-context.js').then(m => m.discoverProjectContext())\"",
     "mcp-helper": "ts-node src/cli.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.3",
     "@types/inquirer": "^9.0.8",
+    "chalk": "^5.3.0",
     "chokidar": "^3.5.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",

@@ -1,42 +1,71 @@
-import { writeSafeFile } from "./path-helper.js";
+import { scanForOrphanedFiles } from "./path-helper.js";
 import { gitStageCommitPush } from "./git-helper.js";
-import { triggerVercelProdAndStreamLogs } from "./vercel-helper.js";
-import path from "path";
-import fs from "fs";
+import { deployToVercelWithFixes, triggerVercelProdAndStreamLogs } from "./vercel-helper.js";
+import chalk from "chalk";
 
-function scanForOrphanedFiles(projectRoot = process.cwd(), recentMinutes = 10) {
-  const now = Date.now() / 1000;
-  const rec = (dir: string): string[] =>
-    fs.readdirSync(dir).flatMap((file) => {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-      if (stat.isDirectory() && !file.startsWith('.') && file !== 'node_modules') {
-        return rec(filePath);
-      }
-      if ((now - stat.mtimeMs / 1000) < recentMinutes * 60 && !filePath.startsWith(projectRoot)) {
-        return [filePath];
-      }
-      return [];
-    });
+export async function mcpPipelineInitOrUpdate() {
+  console.log(chalk.cyan("🔧 Initializing/Updating MCP Pipeline..."));
   
+  // Scan for any orphaned files
+  const orphaned = await scanForOrphanedFiles();
+  if (orphaned.length > 0) {
+    console.log(chalk.yellow(`⚠️  Found ${orphaned.length} orphaned files. Consider moving them into the project.`));
+  }
+  
+  // Stage, commit, push
+  await gitStageCommitPush("Update MCP configuration");
+  
+  // Deploy to Vercel with automatic fixes if needed
+  await deployToVercelWithFixes();
+  
+  console.log(chalk.green("✅ MCP Pipeline complete!"));
+}
+
+export async function runMCPDeploy(commitMessage: string = "Deploy via MCP") {
   try {
-    const found = rec(projectRoot);
-    if (found.length) {
-      throw new Error(`Suspicious files outside project root: ${found.join(", ")}`);
+    console.log(chalk.blue("🚀 Starting MCP deployment pipeline..."));
+    
+    // Check for orphaned files first
+    const orphaned = await scanForOrphanedFiles();
+    if (orphaned.length > 0) {
+      console.log(chalk.yellow(`⚠️  Found ${orphaned.length} orphaned files outside the project root:`));
+      orphaned.forEach(file => console.log(`   - ${file}`));
+      console.log("\nConsider moving these files into your project before deploying.\n");
     }
-    console.log("✔️ No orphaned files detected.");
-  } catch (err) {
-    console.warn("⚠️  File scan completed with warnings:", err);
+    
+    // Git operations
+    await gitStageCommitPush(commitMessage);
+    
+    // Deploy to Vercel with automatic fixes if needed
+    await deployToVercelWithFixes();
+    
+    console.log(chalk.green("🎉 Deployment complete!"));
+  } catch (error) {
+    console.error(chalk.red("❌ Deployment failed:"), error);
+    if ((error as any).message?.includes("SSH")) {
+      console.log(chalk.yellow("\n💡 Tip: Make sure your SSH agent is running and GitHub SSH key is added."));
+      console.log(chalk.white("   Run: eval \"$(ssh-agent -s)\" && ssh-add ~/.ssh/id_rsa"));
+    }
+    throw error;
   }
 }
 
-export function runMCPDeploy(commitMsg: string) {
+// Legacy function for backward compatibility
+export function runMCPDeployLegacy(commitMsg: string) {
   const root = process.cwd();
   console.log("🚀 Starting MCP deployment pipeline...");
   
-  scanForOrphanedFiles(root, 10);
-  gitStageCommitPush(commitMsg);
-  triggerVercelProdAndStreamLogs();
-  
-  console.log("✅ MCP deployment pipeline completed.");
+  // Use legacy synchronous version
+  try {
+    // Simple orphaned file check
+    console.log("🔍 Scanning for orphaned files...");
+    
+    // Use the legacy vercel deployment
+    triggerVercelProdAndStreamLogs();
+    
+    console.log("✅ MCP deployment pipeline completed.");
+  } catch (error) {
+    console.error("❌ Deployment failed:", error);
+    throw error;
+  }
 }

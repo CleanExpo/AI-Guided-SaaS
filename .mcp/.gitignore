@@ -21,3 +21,4 @@ logs/
 *.tmp
 desktop.ini
 $RECYCLE.BIN/
+.vercel
