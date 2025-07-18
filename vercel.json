@@ -1,6 +1,4 @@
 {
-  "name": "ai-guided-saas",
-  "version": 2,
   "functions": {
     "api/*.js": {
       "maxDuration": 10
